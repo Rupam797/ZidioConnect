@@ -1,24 +1,32 @@
 import React, { createContext, useContext, useState } from 'react';
 
-// ✅ Named export for use in useAuth.js
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(() => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
-    return token ? { token, role } : null;
+    const name = localStorage.getItem('name');
+    const email = localStorage.getItem('email');
+    const avatar = localStorage.getItem('avatar');
+    return token ? { token, role, name, email, avatar } : null;
   });
 
-  const login = (token, role) => {
+  const login = (token, role, name, email, avatar = null) => {
     localStorage.setItem('token', token);
     localStorage.setItem('role', role);
-    setAuth({ token, role });
+    localStorage.setItem('name', name);
+    localStorage.setItem('email', email);
+    if (avatar) localStorage.setItem('avatar', avatar);
+    setAuth({ token, role, name, email, avatar });
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('name');
+    localStorage.removeItem('email');
+    localStorage.removeItem('avatar');
     setAuth(null);
   };
 
@@ -28,3 +36,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export const useAuthContext = () => useContext(AuthContext);

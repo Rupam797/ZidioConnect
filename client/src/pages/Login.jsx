@@ -1,104 +1,115 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from '../services/axios';
 import { useAuth } from '../hooks/useAuth';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
-  const [form, setForm] = useState({ username: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const handleInputChange = (field) => (e) => {
+    setForm({ ...form, [field]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Basic validation
-    if (!form.username.trim() || !form.password.trim()) {
-      setError('Please fill in all fields');
+
+    if (!form.email.trim() || !form.password.trim()) {
+      toast.error('Please fill in all fields');
       return;
     }
 
     setLoading(true);
-    setError('');
-
     try {
       const res = await axios.post('/auth/login', form);
       login(res.data.token, res.data.role);
-      
-      // Role-based navigation
+
+      toast.success('Login successful!');
+
       const roleRoutes = {
         STUDENT: '/student/dashboard',
         RECRUITER: '/recruiter/dashboard',
-        ADMIN: '/admin/dashboard'
+        ADMIN: '/admin/dashboard',
       };
-      
-      navigate(roleRoutes[res.data.role] || '/dashboard');
+
+      setTimeout(() => {
+        navigate(roleRoutes[res.data.role] || '/dashboard');
+      }, 1000);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Invalid credentials. Please try again.';
-      setError(errorMessage);
+      toast.error(err.response?.data || 'Invalid credentials');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (field) => (e) => {
-    setForm({ ...form, [field]: e.target.value });
-    // Clear error when user starts typing
-    if (error) setError('');
-  };
-
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 border shadow rounded">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50 dark:bg-gray-900">
+      <ToastContainer />
+
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-green-600 dark:text-green-400">Zidio Connect</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">Login to your account</p>
         </div>
-      )}
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-            Username
-          </label>
-          <input
-            id="username"
-            className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            type="text"
-            placeholder="Enter your username"
-            value={form.username}
-            onChange={handleInputChange('username')}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={form.email}
+              onChange={handleInputChange('email')}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="you@example.com"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={form.password}
+              onChange={handleInputChange('password')}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="••••••••"
+              required
+              disabled={loading}
+            />
+            <p className="text-right text-sm mt-1">
+              <Link to="/forgot-password" className="text-green-600 dark:text-green-400 font-medium hover:underline">
+                Forgot password?
+              </Link>
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white py-2 rounded-lg font-semibold hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 transition-all duration-300"
             disabled={loading}
-            required
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
-          <input
-            id="password"
-            className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            type="password"
-            placeholder="Enter your password"
-            value={form.password}
-            onChange={handleInputChange('password')}
-            disabled={loading}
-            required
-          />
-        </div>
-        
-        <button 
-          type="submit" 
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 rounded transition-colors"
-          disabled={loading}
-        >
-          {loading ? 'Signing in...' : 'Login'}
-        </button>
-      </form>
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-green-600 dark:text-green-400 font-medium hover:underline">
+            Register now
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

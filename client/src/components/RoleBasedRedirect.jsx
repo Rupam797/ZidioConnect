@@ -9,10 +9,21 @@ export default function RoleBasedRedirect() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth?.token) return;
-    if (auth.role === 'STUDENT') navigate('/student/dashboard');
-    else if (auth.role === 'RECRUITER') navigate('/recruiter/dashboard');
-    else if (auth.role === 'ADMIN') navigate('/admin/dashboard');
+    if (!auth?.token || !auth?.role) return;
+
+    switch (auth.role) {
+      case 'STUDENT':
+        navigate('/student/dashboard');
+        break;
+      case 'RECRUITER':
+        navigate('/recruiter/dashboard');
+        break;
+      case 'ADMIN':
+        navigate('/admin/dashboard');
+        break;
+      default:
+        navigate('/unauthorized');
+    }
   }, [auth, navigate]);
 
   return null;

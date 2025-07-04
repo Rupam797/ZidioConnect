@@ -1,12 +1,18 @@
 import { Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Public Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
+import ForgotPassword from './pages/ForgotPassword';
+import VerifyOtp from './pages/VerifyOtp';
+import ResetPassword from './pages/ResetPassword';
 
 // 🧑‍🎓 Student
 import StudentDashboard from './pages/student/Dashboard';
@@ -29,11 +35,16 @@ export default function App() {
   return (
     <>
       <Navbar />
+      <ToastContainer />
+
       <Routes>
-        {/* Public */}
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Student Routes */}
         <Route
@@ -129,7 +140,7 @@ export default function App() {
           }
         />
 
-        {/* 404 */}
+        {/* 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

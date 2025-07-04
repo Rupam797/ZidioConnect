@@ -1,46 +1,34 @@
-// src/pages/student/ResumeUpload.jsx
-
 import { useState } from 'react';
 import axios from '../../services/axios';
+import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 export default function ResumeUpload() {
+  const { userId } = useAuth();
   const [file, setFile] = useState(null);
-  const [resumeUrl, setResumeUrl] = useState('');
 
-  const upload = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file) return;
+
     const formData = new FormData();
     formData.append('file', file);
+
     try {
-      const res = await axios.post('/student/upload-resume', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setResumeUrl(res.data);
-      alert('Resume uploaded successfully');
-    } catch {
-      alert('Upload failed');
+      await axios.post(`/student/resume/${userId}`, formData);
+      toast.success("Resume uploaded!");
+    } catch (err) {
+      toast.error("Upload failed");
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 space-y-4">
-      <h2 className="text-xl font-bold">Upload Your Resume</h2>
-      <input
-        type="file"
-        accept="application/pdf"
-        onChange={(e) => setFile(e.target.files[0])}
-        className="border p-2 rounded w-full"
-      />
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-        onClick={upload}
-      >
-        Upload
-      </button>
-      {resumeUrl && (
-        <p className="text-green-700 mt-4">
-          Resume URL: <a href={resumeUrl} target="_blank" rel="noreferrer" className="underline">{resumeUrl}</a>
-        </p>
-      )}
+    <div className="p-4 max-w-md">
+      <h2 className="text-xl font-bold mb-4">Upload Resume</h2>
+      <form onSubmit={handleSubmit}>
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        <button className="bg-blue-600 text-white py-2 px-4 mt-2 rounded">Upload</button>
+      </form>
     </div>
   );
 }
