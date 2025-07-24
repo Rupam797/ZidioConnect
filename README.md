@@ -62,4 +62,4 @@ This project is licensed under the MIT License.
 
 ## 📬 Contact
 Developer: Rupam Giri
-🌐 LinkedIn: linkedin.com/in/your-profile
+🌐 LinkedIn: [linkedin.com/in/rupamgiri](https://www.linkedin.com/in/-rupam-giri/)
